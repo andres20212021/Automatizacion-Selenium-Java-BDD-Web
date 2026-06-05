@@ -1,22 +1,18 @@
 name: Web Automation Tests
 
 on:
-  # Se ejecuta cuando se sube un cambio directamente a main
   push:
     branches:
       - main
 
-  # Se ejecuta cuando se crea o actualiza un Pull Request hacia main
   pull_request:
     branches:
       - main
 
-  # Permite ejecutar el pipeline manualmente desde GitHub Actions
   workflow_dispatch:
 
   # Ejecución programada todos los domingos a las 12:00 del día.
   # Para Chile, revisar diferencia horaria según horario de invierno/verano.
-  # Para activar esta ejecución, quitar los comentarios:
   # schedule:
   #   - cron: "0 12 * * 0"
 
@@ -105,17 +101,22 @@ jobs:
         uses: actions/configure-pages@v5
 
       # Sube el reporte Allure generado para publicarlo en GitHub Pages
+      # Se define un nombre personalizado para evitar conflicto con artifacts duplicados
       - name: Upload Allure report to GitHub Pages
         if: always()
         uses: actions/upload-pages-artifact@v3
         with:
+          name: allure-github-pages
           path: target/site/allure-maven-plugin
 
       # Publica el reporte Allure en GitHub Pages
+      # Se indica explícitamente qué artifact debe publicar
       - name: Deploy Allure report to GitHub Pages
         if: always()
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: allure-github-pages
 
       # Muestra en consola la URL del reporte publicado
       - name: Show Allure report URL
