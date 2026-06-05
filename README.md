@@ -22,9 +22,22 @@ patrón **Page Object Model**, separación de responsabilidades, reportes visual
 
 ---
 
+# Cómo visualizar el reporte
+
+Una vez finalizada la ejecución de las pruebas de regresión en GitHub Actions, el reporte de resultados se publica automáticamente en GitHub Pages mediante Allure Report.
+
+Para visualizar el reporte, ingrese a la ejecución del pipeline y se visualizara esta imagen.
+
+![Allure Report URL](imagenes/AllureReportURL.png)
+
+Luego haga clic en el enlace que se visualiza en la imagen.
+
+Desde esta URL podrá revisar el detalle de los escenarios ejecutados, el estado de cada prueba, los errores encontrados y las evidencias adjuntas, como capturas de pantalla en caso de fallos.
+
 ## Sitio bajo prueba
 
 El sitio utilizado para las pruebas automatizadas es:
 
 ```text
 https://www.demoblaze.com/index.html
+
