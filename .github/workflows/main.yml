@@ -13,9 +13,17 @@ on:
 
   # Ejecución programada todos los domingos a las 12:00 del día.
   # Para Chile, revisar diferencia horaria según horario de invierno/verano.
-  
   # schedule:
   #   - cron: "0 12 * * 0"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
 
 jobs:
   selenium-tests:
@@ -33,13 +41,10 @@ jobs:
           java-version: 21
           cache: maven
 
-      - name: Show Java and Maven versions
+      - name: Show Java, Maven and Chrome versions
         run: |
           java -version
           mvn -version
-
-      - name: Show Chrome version
-        run: |
           google-chrome --version
 
       - name: Run automated tests
@@ -63,14 +68,6 @@ jobs:
           path: target/allure-results
           if-no-files-found: warn
 
-      - name: Upload Allure HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-html-report
-          path: target/site/allure-maven-plugin
-          if-no-files-found: warn
-
       - name: Upload Surefire reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,6 +75,27 @@ jobs:
           name: surefire-reports
           path: target/surefire-reports
           if-no-files-found: warn
+
+      - name: Configure GitHub Pages
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Upload Allure report to GitHub Pages
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/site/allure-maven-plugin
+
+      - name: Deploy Allure report to GitHub Pages
+        if: always() && github.event_name != 'pull_request'
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Show Allure report URL
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          echo "Allure report published at:"
+          echo "${{ steps.deployment.outputs.page_url }}"
 
       - name: Validate test result
         if: always()
