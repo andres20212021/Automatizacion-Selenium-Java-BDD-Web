@@ -15,11 +15,8 @@ on:
   workflow_dispatch:
 
   # Ejecución programada todos los domingos a las 12:00 del día.
-  # GitHub Actions usa horario UTC.
   # Para Chile, revisar diferencia horaria según horario de invierno/verano.
-  #
-  # Para activarlo, quitar los comentarios:
-  #
+  # Para activar esta ejecución, quitar los comentarios:
   # schedule:
   #   - cron: "0 12 * * 0"
 
@@ -52,25 +49,30 @@ jobs:
           java-version: 21
           cache: maven
 
+      # Muestra versiones para diagnóstico
       - name: Show Java, Maven and Chrome versions
         run: |
           java -version
           mvn -version
           google-chrome --version
 
+      # Ejecuta solo las pruebas marcadas con el tag @regression
       - name: Run automated tests
         run: |
           set +e
-          xvfb-run -a mvn clean test
+          xvfb-run -a mvn clean test -Dcucumber.filter.tags="@regression"
           TEST_EXIT_CODE=$?
           echo "TEST_EXIT_CODE=$TEST_EXIT_CODE" >> $GITHUB_ENV
           exit 0
 
+      # Genera el reporte Allure HTML
+      # Se ejecuta siempre, aunque alguna prueba falle
       - name: Generate Allure report
         if: always()
         run: |
           mvn allure:report
 
+      # Guarda los resultados crudos de Allure como artifact
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v4
@@ -79,6 +81,7 @@ jobs:
           path: target/allure-results
           if-no-files-found: warn
 
+      # Guarda el reporte HTML de Allure como artifact descargable
       - name: Upload Allure HTML report
         if: always()
         uses: actions/upload-artifact@v4
@@ -87,6 +90,7 @@ jobs:
           path: target/site/allure-maven-plugin
           if-no-files-found: warn
 
+      # Guarda los reportes de Maven Surefire
       - name: Upload Surefire reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -95,27 +99,33 @@ jobs:
           path: target/surefire-reports
           if-no-files-found: warn
 
+      # Configura GitHub Pages
       - name: Configure GitHub Pages
         if: always()
         uses: actions/configure-pages@v5
 
+      # Sube el reporte Allure generado para publicarlo en GitHub Pages
       - name: Upload Allure report to GitHub Pages
         if: always()
         uses: actions/upload-pages-artifact@v3
         with:
           path: target/site/allure-maven-plugin
 
+      # Publica el reporte Allure en GitHub Pages
       - name: Deploy Allure report to GitHub Pages
         if: always()
         id: deployment
         uses: actions/deploy-pages@v4
 
+      # Muestra en consola la URL del reporte publicado
       - name: Show Allure report URL
         if: always()
         run: |
           echo "Allure report published at:"
           echo "${{ steps.deployment.outputs.page_url }}"
 
+      # Valida el resultado final de las pruebas
+      # Si alguna prueba falló, el pipeline queda como failed
       - name: Validate test result
         if: always()
         run: |
