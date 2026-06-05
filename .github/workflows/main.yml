@@ -1,18 +1,25 @@
 name: Web Automation Tests
 
 on:
+  # Se ejecuta cuando se sube un cambio directamente a main
   push:
     branches:
       - main
 
+  # Se ejecuta cuando se crea o actualiza un Pull Request hacia main
   pull_request:
     branches:
       - main
 
+  # Permite ejecutar el pipeline manualmente desde GitHub Actions
   workflow_dispatch:
 
   # Ejecución programada todos los domingos a las 12:00 del día.
+  # GitHub Actions usa horario UTC.
   # Para Chile, revisar diferencia horaria según horario de invierno/verano.
+  #
+  # Para activarlo, quitar los comentarios:
+  #
   # schedule:
   #   - cron: "0 12 * * 0"
 
@@ -29,6 +36,10 @@ jobs:
   selenium-tests:
     name: Run Selenium Cucumber Tests
     runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repository
@@ -68,6 +79,14 @@ jobs:
           path: target/allure-results
           if-no-files-found: warn
 
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-html-report
+          path: target/site/allure-maven-plugin
+          if-no-files-found: warn
+
       - name: Upload Surefire reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -77,22 +96,22 @@ jobs:
           if-no-files-found: warn
 
       - name: Configure GitHub Pages
-        if: always() && github.event_name != 'pull_request'
+        if: always()
         uses: actions/configure-pages@v5
 
       - name: Upload Allure report to GitHub Pages
-        if: always() && github.event_name != 'pull_request'
+        if: always()
         uses: actions/upload-pages-artifact@v3
         with:
           path: target/site/allure-maven-plugin
 
       - name: Deploy Allure report to GitHub Pages
-        if: always() && github.event_name != 'pull_request'
+        if: always()
         id: deployment
         uses: actions/deploy-pages@v4
 
       - name: Show Allure report URL
-        if: always() && github.event_name != 'pull_request'
+        if: always()
         run: |
           echo "Allure report published at:"
           echo "${{ steps.deployment.outputs.page_url }}"
