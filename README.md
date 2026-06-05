@@ -22,6 +22,40 @@ patrón **Page Object Model**, separación de responsabilidades, reportes visual
 
 ---
 
+## Ejecución de pruebas de regresión en GitHub Actions
+
+El proyecto cuenta con un pipeline configurado en **GitHub Actions** para ejecutar automáticamente las pruebas de regresión del framework.
+
+Las pruebas de regresión se identifican mediante el tag de Cucumber:
+
+```gherkin
+@regression
+```
+### Ejecución programada
+
+El pipeline también tiene preparada una configuración para ejecución programada todos los domingos a las 12:00 del día, pero actualmente se encuentra comentada en el archivo YAML.
+
+```yaml
+# schedule:
+#   - cron: "0 12 * * 0"
+```
+
+Para activar esta ejecución programada, se deben quitar los comentarios de esas líneas en el archivo:
+
+```text
+.github/workflows/main.yml
+```
+
+Las pruebas de regresión se ejecutan automáticamente en las siguientes condiciones:
+
+| Condición | Descripción |
+|----------|-------------|
+| Push a `main` | Se ejecutan cuando se sube un cambio directamente a la rama `main`. |
+| Pull Request hacia `main` | Se ejecutan cuando se crea o actualiza una Pull Request apuntando a la rama `main`. |
+| Ejecución manual | Se pueden ejecutar manualmente desde la pestaña **Actions** de GitHub. |
+
+
+
 # Cómo visualizar el reporte
 
 Una vez finalizada la ejecución de las pruebas de regresión en GitHub Actions, el reporte de resultados se publica automáticamente en GitHub Pages mediante Allure Report.
