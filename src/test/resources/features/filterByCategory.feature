@@ -1,3 +1,4 @@
+@regression
 Feature: Filtrado de productos por categorias en Demoblaze
 
   Como usuario de la tienda Demoblaze

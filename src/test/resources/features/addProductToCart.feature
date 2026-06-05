@@ -1,3 +1,4 @@
+@regression
 Feature: Agregar producto al carrito en Demoblaze
 
   Como usuario de la tienda Demoblaze
