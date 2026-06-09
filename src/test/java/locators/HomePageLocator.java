@@ -12,4 +12,5 @@ public class HomePageLocator {
     public static By productByName(String productName) {
         return By.xpath("//a[text()='" + productName + "']");
     }
+
 }
