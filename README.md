@@ -24,7 +24,7 @@ patrón **Page Object Model**, separación de responsabilidades, reportes visual
 
 Para ejecutar las pruebas automatizadas de forma local, primero se debe clonar el repositorio y abrir el proyecto en un IDE como **IntelliJ IDEA**.
 
-### 1. Clonar el repositorio
+### Clonar el repositorio
 
 ```bash
 git clone https://github.com/andres20212021/Automatizacion-Selenium-Java-BDD-Web.git
@@ -40,6 +40,7 @@ mvn clean test
 Visualizar el reporte Allure localmente
 mvn allure:serve 
 Este comando genera y levanta automáticamente el reporte Allure en un servidor local, abriéndolo en el navegador
+```
 
 ## Ejecución de pruebas de regresión en GitHub Actions
 
